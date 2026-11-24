@@ -10,7 +10,7 @@ export default function OpenSession() {
   useEffect(() => {
     api.桩位().then((list) => {
       setPiles(list)
-      const idle = list.find((p) => p.status === '空闲')
+      const idle = list.find((p) => p.可开充)
       if (idle) setPileId(String(idle.id))
     })
   }, [])
@@ -18,7 +18,7 @@ export default function OpenSession() {
     if (!pileId) return
     api.枪线(Number(pileId)).then((list) => {
       setGuns(list)
-      const ok = list.find((g) => g.status === '可用')
+      const ok = list.find((g) => g.可开充)
       setGunId(ok ? String(ok.id) : '')
     })
   }, [pileId])
@@ -28,7 +28,7 @@ export default function OpenSession() {
       const body = { 桩位编号: Number(pileId) }
       if (gunId) body.枪线编号 = Number(gunId)
       const r = await api.开会话(body)
-      setMsg(`已开 ${r.会话号}，锁定电价 ${r.锁定电价}`)
+      setMsg(`已开 ${r.会话号}，锁定电价 ${r.锁定电价}，桩枪已占用`)
       const list = await api.桩位()
       setPiles(list)
     } catch (e) {
@@ -45,7 +45,8 @@ export default function OpenSession() {
           <select value={pileId} onChange={(e) => setPileId(e.target.value)}>
             {piles.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.site_name} · {p.name} · {p.status}
+                {p.site_name} · {p.name} · {p.展示状态}
+                {p.占用未清 ? ' · 待拔枪' : ''}
               </option>
             ))}
           </select>
@@ -54,7 +55,7 @@ export default function OpenSession() {
             <option value="">自动选可用</option>
             {guns.map((g) => (
               <option key={g.id} value={g.id}>
-                {g.name} · {g.status}
+                {g.name} · {g.展示状态}
               </option>
             ))}
           </select>

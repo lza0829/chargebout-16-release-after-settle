@@ -18,6 +18,7 @@ export default function Sessions() {
               <th>会话号</th>
               <th>站点桩位</th>
               <th>状态</th>
+              <th>占用</th>
               <th>电量</th>
               <th>金额</th>
               <th>营业日</th>
@@ -33,6 +34,9 @@ export default function Sessions() {
                 </td>
                 <td>
                   <span className={`tag ${s.status}`}>{s.status}</span>
+                </td>
+                <td>
+                  <span className={`tag ${s.占用标签}`}>{s.占用标签}</span>
                 </td>
                 <td>{s.kwh}</td>
                 <td>{s.amount}</td>
@@ -53,7 +57,12 @@ export default function Sessions() {
             {detail.slip_no} · <span className={`tag ${detail.status}`}>{detail.status}</span>
           </h3>
           <p>
-            锁定电价 {detail.price_locked} · 电量 {detail.kwh} · 金额 {detail.amount}
+            锁定电价 {detail.price_locked} · 电量 {detail.kwh} · 金额 {detail.amount} · 占用{' '}
+            <span className={`tag ${detail.占用标签}`}>{detail.占用标签}</span>
+            {detail.待拔枪确认 && '（待拔枪确认腾空）'}
+          </p>
+          <p>
+            口径 {detail.占用口径} · 腾空时间 {detail.腾空时间 || '未腾空'}
           </p>
           <h3>脉冲</h3>
           <table>
@@ -70,6 +79,29 @@ export default function Sessions() {
                   <td>{p.created_at}</td>
                   <td>{p.delta_kwh}</td>
                   <td>{p.power_kw}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <h3>占用事件</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>动作</th>
+                <th>占用</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(detail.占用事件 || []).map((e) => (
+                <tr key={e.id}>
+                  <td>{e.created_at}</td>
+                  <td>{e.kind}</td>
+                  <td>
+                    桩 {e.pile_id} · 枪 {e.gun_id}
+                  </td>
+                  <td>{e.note}</td>
                 </tr>
               ))}
             </tbody>

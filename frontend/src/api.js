@@ -26,9 +26,13 @@ export const api = {
   费率: () => req('/费率'),
   会话: (状态) => req(状态 ? `/会话?状态=${encodeURIComponent(状态)}` : '/会话'),
   会话详情: (id) => req(`/会话/${id}`),
+  待拔枪: () => req('/待拔枪'),
+  一致性: () => req('/会话/一致性'),
   开会话: (body) => req('/开会话', { method: 'POST', body: JSON.stringify(body) }),
   脉冲: (id, body) => req(`/会话/${id}/脉冲`, { method: 'POST', body: JSON.stringify(body) }),
   结算: (id) => req(`/会话/${id}/结算`, { method: 'POST', body: '{}' }),
+  拔枪确认: (id, 备注 = '') =>
+    req(`/会话/${id}/拔枪确认`, { method: 'POST', body: JSON.stringify({ 备注 }) }),
   超时: (id) => req(`/会话/${id}/超时`, { method: 'POST', body: '{}' }),
   中断: (id, 原因 = '急停') =>
     req(`/会话/${id}/中断`, { method: 'POST', body: JSON.stringify({ 原因 }) }),

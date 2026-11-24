@@ -9,14 +9,20 @@ export default function Guns() {
   return (
     <div className="page">
       <h2>枪线</h2>
-      <p className="lead">各桩枪口可用与占用态。</p>
+      <p className="lead">
+        枪线占用与桩位同源同命运：同一笔会话关账后仍占枪，拔枪确认才归还。
+      </p>
       <div className="panel">
         <table>
           <thead>
             <tr>
               <th>桩位</th>
               <th>枪名</th>
-              <th>状态</th>
+              <th>展示状态</th>
+              <th>占用</th>
+              <th>占用未清</th>
+              <th>占用会话</th>
+              <th>可开充</th>
             </tr>
           </thead>
           <tbody>
@@ -25,8 +31,12 @@ export default function Guns() {
                 <td>{g.pile_name}</td>
                 <td>{g.name}</td>
                 <td>
-                  <span className={`tag ${g.status}`}>{g.status}</span>
+                  <span className={`tag ${g.展示状态}`}>{g.展示状态}</span>
                 </td>
+                <td>{g.占用 ? '是' : '否'}</td>
+                <td>{g.占用未清 ? '是' : '否'}</td>
+                <td>{g.会话号 || '—'}</td>
+                <td>{g.可开充 ? '是' : '否'}</td>
               </tr>
             ))}
           </tbody>

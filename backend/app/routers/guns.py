@@ -1,7 +1,7 @@
 from __future__ import annotations
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
-from app.db import db
+from app.db import db, tx
 from app.services import core
 
 router = APIRouter()
@@ -20,7 +20,7 @@ def list_guns(桩位编号: int | None = None):
 
 @router.post("/枪线")
 def create_gun(body: GunIn):
-    with db() as conn:
+    with tx() as conn:
         cur = conn.execute(
             "INSERT INTO guns(pile_id,name,status) VALUES(?,?, '可用')",
             (body.桩位编号, body.名称),

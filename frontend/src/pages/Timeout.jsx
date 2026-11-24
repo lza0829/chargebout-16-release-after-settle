@@ -20,7 +20,7 @@ export default function Timeout() {
   const abort = async (id) => {
     try {
       const r = await api.中断(id, '急停')
-      setMsg(`会话 ${r.会话编号} ${r.状态}`)
+      setMsg(`会话 ${r.会话编号} ${r.状态}；桩枪占用未清，请到结算关账页拔枪确认腾空`)
       load()
     } catch (e) {
       setMsg(e.message)
@@ -29,7 +29,9 @@ export default function Timeout() {
   return (
     <div className="page">
       <h2>超时与中断</h2>
-      <p className="lead">对充电中会话标超时，或急停中断并释放占用。</p>
+      <p className="lead">
+        对充电中会话标超时；急停中断只终止会话并落已中断，桩枪占用仍待拔枪确认后腾空。
+      </p>
       <div className="panel">
         <table>
           <thead>

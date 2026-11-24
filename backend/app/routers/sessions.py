@@ -1,7 +1,8 @@
 from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from app.db import db
+
+from app.db import db, tx
 from app.services import core
 from app.services import sessions as svc
 
@@ -22,10 +23,26 @@ class AbortIn(BaseModel):
     原因: str = "急停"
 
 
+class UnplugIn(BaseModel):
+    备注: str = ""
+
+
 @router.get("/会话")
 def list_sessions(状态: str | None = None):
     with db() as conn:
         return core.list_sessions(conn, 状态)
+
+
+@router.get("/待拔枪")
+def pending_release():
+    with db() as conn:
+        return core.pending_release(conn)
+
+
+@router.get("/会话/一致性")
+def consistency():
+    with db() as conn:
+        return core.consistency(conn)
 
 
 @router.get("/会话/{session_id}")
@@ -39,30 +56,36 @@ def get_session(session_id: int):
 
 @router.post("/开会话")
 def open_session(body: OpenIn):
-    with db() as conn:
+    with tx() as conn:
         return svc.open_session(conn, body.桩位编号, body.枪线编号)
 
 
 @router.post("/会话/{session_id}/脉冲")
 def add_pulse(session_id: int, body: PulseIn):
-    with db() as conn:
+    with tx() as conn:
         return svc.add_pulse(conn, session_id, body.电量, body.功率)
 
 
 @router.post("/会话/{session_id}/结算")
 def settle(session_id: int):
-    with db() as conn:
+    with tx() as conn:
         return svc.settle(conn, session_id)
+
+
+@router.post("/会话/{session_id}/拔枪确认")
+def confirm_unplug(session_id: int, body: UnplugIn | None = None):
+    with tx() as conn:
+        return svc.confirm_unplug(conn, session_id, body.备注 if body else "")
 
 
 @router.post("/会话/{session_id}/超时")
 def timeout(session_id: int):
-    with db() as conn:
+    with tx() as conn:
         return svc.mark_timeout(conn, session_id)
 
 
 @router.post("/会话/{session_id}/中断")
 def abort(session_id: int, body: AbortIn | None = None):
-    with db() as conn:
+    with tx() as conn:
         reason = body.原因 if body else "急停"
         return svc.abort_session(conn, session_id, reason)
